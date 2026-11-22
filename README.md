@@ -108,6 +108,8 @@ It shows both teams with logos, each name followed by the team's rank (league po
 
 When the card shows a current (live) or previous game, clicking the game block opens the match page on the website in a new browser tab. The website cannot be embedded in Home Assistant (it forbids framing), so a new tab is used. The next game is not clickable.
 
+**Long press:** pressing and holding anywhere on the card opens Home Assistant's more-info dialog for the card's sensor.
+
 Current game is empty when nothing is live, so use a Next game or Previous game sensor for a card that always shows something.
 
 ### Markdown card alternative
@@ -154,6 +156,8 @@ At least one of `next`, `current` or a non-empty `previous` is required; entries
 - In the top block (live or next game), the team logo and name open that team's page, and the middle (date, time and venue, or the score) opens the game page.
 - A previous-result row opens its match.
 - Anything without a known link stays plain text.
+
+**Long press:** pressing and holding anywhere on the card opens the more-info dialog for the current game sensor while a game is live, otherwise for the next game sensor.
 
 The single-game card keeps its simpler behaviour: the whole block is one link to the match, for live and finished games only. The venue of an upcoming game shows under its kick-off time.
 
