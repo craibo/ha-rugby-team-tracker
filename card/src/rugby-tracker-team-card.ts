@@ -1,6 +1,7 @@
 import { LitElement, html, css, nothing, type PropertyValues } from "lit";
 import "./team-editor";
 import { registerCard } from "./register";
+import { createLongPress, fireMoreInfo } from "./long-press";
 import { gameBlock, gameBlockStyles } from "./game-block";
 import type { HassEntity } from "./state";
 import {
@@ -28,6 +29,16 @@ export class RugbyTrackerTeamCard extends LitElement {
 
   declare _config?: TeamConfig;
   declare _hass?: Hass;
+
+  private _press = createLongPress(() => {
+    const id = this._view()?.moreInfoEntity;
+    if (id) fireMoreInfo(this, id);
+  });
+
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this._press.cancel();
+  }
 
   static getConfigElement(): HTMLElement {
     return document.createElement("rugby-tracker-team-card-editor");
@@ -74,7 +85,20 @@ export class RugbyTrackerTeamCard extends LitElement {
   render() {
     const v = this._view();
     if (!v) return nothing;
-    return html`<ha-card>
+    return html`<ha-card
+      @pointerdown=${(e: PointerEvent) => this._press.start(e)}
+      @pointermove=${(e: PointerEvent) => this._press.move(e)}
+      @pointerup=${() => this._press.cancel()}
+      @pointercancel=${() => this._press.cancel()}
+      @pointerleave=${() => this._press.cancel()}
+      @contextmenu=${(e: Event) => e.preventDefault()}
+      @click=${(e: Event) => {
+        if (this._press.consumeFired()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }}
+    >
       ${v.heading ? html`<div class="heading">${v.heading}</div>` : nothing}
       ${gameBlock(v.top, { linkMode: "parts" })}
       <hr class="divider" />

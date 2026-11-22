@@ -29,7 +29,13 @@ export type PreviousRow = {
 export const previousLinkLabel = (opposition: string): string =>
   `Open the match against ${opposition} on the website`;
 
-export type TeamCardView = { top: CardView; previous: PreviousRow[]; heading?: string };
+export type TeamCardView = {
+  top: CardView;
+  previous: PreviousRow[];
+  heading?: string;
+  /** Sensor a long press opens: current game while live, else next game. */
+  moreInfoEntity?: string;
+};
 
 const MAX_PREVIOUS = 5;
 const SUFFIX = /_(?:current_game|next_game|previous_game_[1-5])$/;
@@ -180,6 +186,7 @@ export function buildTeamView(
   const nxt = buildView(get(config.next), locale, timeZone);
   const top =
     cur.mode === "live" ? cur : nxt.mode === "upcoming" ? nxt : buildView(undefined, locale, timeZone);
+  const moreInfoEntity = cur.mode === "live" ? config.current : (config.next ?? config.current);
   const previous = (config.previous ?? [])
     .slice(0, MAX_PREVIOUS)
     .map((id) => previousRow(get(id), locale, timeZone))
@@ -188,7 +195,7 @@ export function buildTeamView(
     config.show_header === false
       ? undefined
       : (str(config.title) ?? deriveTeamName(states, config));
-  return { top, previous, heading };
+  return { top, previous, heading, moreInfoEntity };
 }
 
 type States = Record<string, unknown> | undefined;

@@ -67,6 +67,19 @@ const cfg = {
   previous: ["p1", "p2", "p3", "p4", "p5"],
 };
 
+describe("buildTeamView moreInfoEntity", () => {
+  it("is the current sensor while live", () => {
+    expect(buildTeamView({ c: live, n: next }, cfg, "en", "UTC").moreInfoEntity).toBe("c");
+  });
+  it("is the next sensor when not live", () => {
+    expect(buildTeamView({ c: none, n: next }, cfg, "en", "UTC").moreInfoEntity).toBe("n");
+    expect(buildTeamView({}, cfg, "en", "UTC").moreInfoEntity).toBe("n");
+  });
+  it("falls back to current when no next is configured", () => {
+    expect(buildTeamView({ c: none }, { current: "c" }, "en", "UTC").moreInfoEntity).toBe("c");
+  });
+});
+
 describe("buildTeamView top", () => {
   it("prefers live current", () => {
     const v = buildTeamView({ c: live, n: next }, cfg, "en", "UTC");
