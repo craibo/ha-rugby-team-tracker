@@ -2,7 +2,7 @@
 
 DOMAIN = "rugby_team_tracker"
 USER_AGENT = (
-    "ha-rugby-team-tracker/0.6.0 "
+    "ha-rugby-team-tracker/0.7.0 "
     "(+https://github.com/craibo/ha-rugby-team-tracker)"
 )
 PERIODS = (
