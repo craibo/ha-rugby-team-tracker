@@ -3,6 +3,7 @@ import "./editor";
 import "./rugby-tracker-team-card";
 import { entityChanged, pickStubEntity } from "./editor-helpers";
 import { registerCard } from "./register";
+import { createLongPress, fireMoreInfo } from "./long-press";
 import { gameBlock, gameBlockStyles } from "./game-block";
 import { buildView, type CardView, type HassEntity } from "./state";
 
@@ -21,6 +22,15 @@ export class RugbyTrackerGameCard extends LitElement {
 
   declare _config?: Config;
   declare _hass?: Hass;
+
+  private _press = createLongPress(() => {
+    if (this._config) fireMoreInfo(this, this._config.entity);
+  });
+
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this._press.cancel();
+  }
 
   static getConfigElement(): HTMLElement {
     return document.createElement("rugby-tracker-game-card-editor");
@@ -63,7 +73,21 @@ export class RugbyTrackerGameCard extends LitElement {
 
   render() {
     if (!this._config) return nothing;
-    return html`<ha-card>${gameBlock(this._view())}</ha-card>`;
+    return html`<ha-card
+      @pointerdown=${(e: PointerEvent) => this._press.start(e)}
+      @pointermove=${(e: PointerEvent) => this._press.move(e)}
+      @pointerup=${() => this._press.cancel()}
+      @pointercancel=${() => this._press.cancel()}
+      @pointerleave=${() => this._press.cancel()}
+      @contextmenu=${(e: Event) => e.preventDefault()}
+      @click=${(e: Event) => {
+        if (this._press.consumeFired()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }}
+      >${gameBlock(this._view())}</ha-card
+    >`;
   }
 
   static styles = gameBlockStyles;
